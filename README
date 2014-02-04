@@ -1,0 +1,66 @@
+//Cojocaru Mihail-Razvan 323CA
+
+Programul curent primeste ca parametrii 2 fisiere.
+Primul contine un text ale carui cuvinte sunt inserate intr-un Radix Tree.
+Al doilea contine o lista de prefixe.
+Pentru fiecare prefix sunt afisate, pe cate o linie, numarul de cuvinte din 
+text care contin acel prefix, precum si o lista cu pozitia in text a fiecarui cuvant.
+
+Clasa FileParser a fost luata din scheletul de cod si nu a fost modificata.
+
+In clasa Index am inlocuit afisarile cu functiile de inserare/cautare in 
+Radix Tree (insert si findByPrefix).
+
+Clasa RadixTreeNode contine informatiile stocate intr-un singur nod al 
+arborelui si anume:
+	key - un String care contine sectiunea de cuvant reprezentata logic pe 
+		muchia dintre parinte si nodul curent;
+	children - un array cu fii nodului curent;
+	poz - un array cu pozitiile din text in care apare cuvantul din nodul curent;
+Clasa mai contine getter/setter pentru cei 3 membrii private descrisi mai sus, 
+precum si o metoda care returneaza numarul de caractere comune dintre key-ul 
+din nod si un string dat. Aceasta metoda(commonLetters) este folosita de 
+functia de insert.
+
+Clasa RadixTree contine implementarea efectiva a arborelui.
+Dintre cele 4 metode ale clasei, doar 2 dintre acestea pot fi folosite efectiv 
+de utilizator, celelalte 2 fiind metode recursive auxiliare folosite de 
+celelalte metode pentru a simplifica transmiterea de parametrii la functia de 
+insert (sa nu fie nevoie transmiterea radacinii ca parametru), respectiv pentru 
+lizibilitatea si modularizarea codului la functia de find.
+
+	Metoda "insert" contine un apel al functiei "insertRec", cu primul 
+parametru nodul "root" iar ceilalti 2 parametri identici cu parametrii primiti 
+de "insert".
+	Metoda "insertRec" realizeaza inserarea propriu-zisa a cuvantului in arbore. 
+Folosind functia commonLetters, aflam numarul de caractere comune dintre 
+cuvantul primit ca parametru si cheia nodului curent. Initial, trebuie sa 
+parcurgem arborele pana ajungem in nodul in care va trebui inserat cuvantul. 
+In functie de numarul de caractere comune si de cele 2 chei(cuvantul si cheia 
+nodului), avem 4 cazuri distincte de inserare. Mentionez ca pe masura ce 
+inaintez prin arbore, cuvantul este sectionat, iar cheia trimisa ca parametru 
+in functia recursiva devine din ce in ce mai mica.
+	- primul caz este acela in care trebuie adaugat un nod nou, ca fiu al 
+		nodului curent.
+	ex: avem cuvantul cal intr-un nod si inseram calcar
+	- al doilea caz este acela in care se realizeaza o sectionare a nodului 
+		curent, si este necesar un nod auxiliar pentru pastrarea proprietatii 
+		de Radix Tree.
+	ex: avem cuvintele caracter si carte, inseram cuvantul caracatita
+	(initial 3 noduri: car, acter, te; in final 5 noduri: car, te, ac, ter, atita)
+	- al treilea caz este acela in care se realizeaza o sectionare a cheii, 
+		fara necesitatea unui nod auxiliar.
+	ex: avem cuvantul cartela in arbore si inseram carte
+	- al patrulea caz este cel mai simplu, in care exista deja un nod cu cheia 
+		necesara in arbore, iar noi pur si simplu adaugam pozitia cuvantului in 
+		array-ul "poz"
+	Metoda "findRec" este folosita de findByPrefix pentru a returna pozitiile 
+tutror cuvintelor dintr-un subarbore al unui nod.
+	Metoda "findByPrefix" afiseaza pozitiile tuturor cuvintelor care contin un 
+prefix primit ca parametru. Prima oara cautam nodul care contine cheia primita 
+ca parametru de metoda (String-ul key) si verificam daca exista cuvinte care 
+contin acel prefix (spre exemplu, daca avem un nod care contine cheia "cal", 
+evident nu vom avea cuvinte cu prefixul "ce"). Pentru verificari folosim 
+boolean-ul find. Daca am gasit ajuns in nodul potrivit, si verificarile s-au 
+incheiat cu succes, afisam cuvintele obtinute prin metoda "findRec". 
+Daca verificarile au esuat, afisam 0.
